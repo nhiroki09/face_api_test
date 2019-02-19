@@ -11,7 +11,13 @@ $ pip install cognitive-face
 
 ## 使い方
 
-1. config.jsonのKeyにFaceAPIのKEYを追記
+1. config.jsonのkeyにFaceAPIのkeyを追記(urlは変更不要)
+```json
+{
+    "key":"xxxx-xxxxxx-xxxxxxxx-xxxxxxxxxxx",
+    "url":"https://japaneast.api.cognitive.microsoft.com/face/v1.0"
+}
+```
 2. 実行
 
 ``` bash

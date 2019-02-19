@@ -10,6 +10,10 @@ $ pip install cognitive-face
 ```
 
 ## 使い方
+
+1. config.jsonのKeyにFaceAPIのKEYを追記
+2. 実行
+
 ``` bash
 $ python register_faces.py face_image_dir [options]
 ```

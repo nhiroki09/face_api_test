@@ -33,7 +33,7 @@ class CognitiveFace:
         results = {}
         for image_file in Path(dir_path).glob('*.jpg'):
             try:
-                print(image_file, person_id)
+                print(image_file, self.person_id_name_[person_id])
                 result = CF.person.add_face(
                     image_file, self.person_group_id_, person_id)
                 results[image_file] = result
@@ -72,6 +72,7 @@ def main(argv):
 
     dirs = sorted([d for d in Path(dir_path).glob('*') if d.is_dir()])
 
+    print('register faces')
     for index, sub_dir in enumerate(dirs):
         cf.register_faces(sub_dir)
 

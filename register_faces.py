@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -32,7 +33,8 @@ class CognitiveFace:
             self.person_group_id_, name=name)['personId']
         self.person_id_name_[person_id] = name
         results = {}
-        for image_file in Path(dir_path).glob('*.jpg'):
+        regex_pattern = re.compile(r'.*\.jpg', re.IGNORECASE)
+        for image_file in [f for f in Path(dir_path).glob('*') if re.match(regex_pattern, f.name)]:
             try:
                 print(image_file, self.person_id_name_[person_id])
                 result = CF.person.add_face(
@@ -64,11 +66,17 @@ class CognitiveFace:
                 return identify_result[0]['candidates'][0]
         return None
 
+    @classmethod
+    def delete_all_person_group(self):
+        pg_list = CF.person_group.lists()
+        for pg in pg_list:
+            CF.person_group.delete(pg['personGroupId'])
 
 def main(dir_path, person_group_id=None, person_group_name=None):
     person_group_id = person_group_id or str(uuid4())
 
     CognitiveFace.initialize()
+
     cf = CognitiveFace(person_group_id, person_group_name)
 
     sub_dirs = sorted([d for d in Path(dir_path).glob('*') if d.is_dir()])
@@ -81,8 +89,9 @@ def main(dir_path, person_group_id=None, person_group_name=None):
     cf.train()
 
     print("check registered faces")
+    regex_pattern = re.compile(r'.*\.jpg', re.IGNORECASE)
     for sub_dir in sub_dirs:
-        for image_file in Path(sub_dir).glob('*.jpg'):
+        for image_file in [f for f in Path(sub_dir).glob('*') if re.match(regex_pattern, f.name)]:
             result = cf.identify(image_file)
             print(image_file, cf.person_id_name_[result['personId']])
 

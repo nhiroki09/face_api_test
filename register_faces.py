@@ -1,3 +1,4 @@
+import argparse
 import json
 import sys
 import time
@@ -42,15 +43,17 @@ class CognitiveFace:
         return results
 
     def train(self):
+        print('START training')
         CF.person_group.train(self.person_group_id_)
-        # until status become success
 
+        # wait while a status is notstarted or running.
         status = CF.person_group.get_status(self.person_group_id_)['status']
         while status in ['notstarted', 'running']:
             time.sleep(1)
             status = CF.person_group.get_status(self.person_group_id_)['status']
         if status == 'failed':
             raise Exception
+        print('END training')
 
     def identify(self, image_path):
         detection_results = CF.face.detect(image_path)
@@ -62,32 +65,39 @@ class CognitiveFace:
         return None
 
 
-def main(argv):
-    dir_path = sys.argv[1]
-    CognitiveFace.initialize()
+def main(dir_path, person_group_id=None, person_group_name=None):
+    person_group_id = person_group_id or str(uuid4())
 
-    person_group_id = str(uuid4())
-    person_group_name = 'mieru'
+    CognitiveFace.initialize()
     cf = CognitiveFace(person_group_id, person_group_name)
 
-    dirs = sorted([d for d in Path(dir_path).glob('*') if d.is_dir()])
+    sub_dirs = sorted([d for d in Path(dir_path).glob('*') if d.is_dir()])
 
-    print('register faces')
-    for index, sub_dir in enumerate(dirs):
+    print('START register faces')
+    for sub_dir in sub_dirs:
         cf.register_faces(sub_dir)
+    print('END register faces')
 
     cf.train()
 
-    print("check registered face")
-    for sub_dir in dirs:
+    print("check registered faces")
+    for sub_dir in sub_dirs:
         for image_file in Path(sub_dir).glob('*.jpg'):
             result = cf.identify(image_file)
             print(image_file, cf.person_id_name_[result['personId']])
 
+    print(f'person_group_id: {person_group_id}')
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print('Usage: register_faces.py image_dir_path')
-        exit(-1)
+    _parser = argparse.ArgumentParser()
+    _parser.add_argument('image_dir', help='face image directory path')
+    _parser.add_argument('--person_group_id', help='person group id')
+    _parser.add_argument('--person_group_name', help='person group name')
 
-    main(sys.argv)
+    _args = _parser.parse_args()
+
+    _image_dir = _args.image_dir
+    _person_group_id = _args.person_group_id
+    _person_group_name = _args.person_group_name
+
+    main(_image_dir, person_group_id=_person_group_id, person_group_name=_person_group_name)

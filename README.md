@@ -11,8 +11,12 @@ $ pip install cognitive-face
 
 ## 使い方
 ``` bash
-$ python register_faces.py face_image_dir
+$ python register_faces.py face_image_dir [options]
 ```
+face_image_dir: 顔画像ディレクトリ  
+[options]  
+--person_group_id [id]: 人物グループID  
+--person_group_name [name]: 人物グループ名  
 
 注) face_image_dirはサブディレクトリに人物名、サブディレクトリ以下に顔画像が配置されていること。
 ```

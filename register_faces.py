@@ -22,7 +22,6 @@ class CognitiveFace:
         self.person_group_id_ = person_group_id
         self.person_group_name_ = person_group_name
         self.person_id_name_ = {}
-        self._create_person_group()
 
     def _create_person_group(self):
         CF.person_group.create(self.person_group_id_, self.person_group_name_)
